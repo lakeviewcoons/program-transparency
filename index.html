@@ -4,6 +4,9 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>Lake View cooNs - breeding With transpaRency</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&display=swap" rel="stylesheet">
 <style>
 :root{
   /* Lake View cooNs house theme. Dark is the default (see <html data-theme>);
@@ -109,9 +112,15 @@ tbody tr:hover{background:var(--surface-2)}
    label at ~4.5px. These breakpoints enlarge the text in user units so it lands ~10-11px
    on screen. (Tina flagged the Cost Control charts, 2026-08-10.) */
 @media(max-width:700px){
-  .axtx{font-size:24px}
-  .barname{font-size:26px}
-  .barlabel{font-size:24px}
+  /* Chart text is drawn in a 760-unit viewBox that gets scaled down to the container, so
+     it must be oversized here to land ~10-11px on screen. Values were still colliding at
+     phone width when embedded, so labels are trimmed back and the cards given less padding
+     to widen the drawing area (seen live on the Squarespace embed, 2026-08-10). */
+  .axtx{font-size:21px}
+  .barname{font-size:22px}
+  .barlabel{font-size:21px}
+  .card{padding:14px 10px 12px}
+  .legend{gap:4px 10px}
 }
 @media(min-width:701px) and (max-width:859px){
   .axtx{font-size:14px}
@@ -147,7 +156,7 @@ tbody tr:hover{background:var(--surface-2)}
 
   /* wide tables scroll rather than crush */
   .tbl-wrap{max-height:none;overflow-x:auto}
-  .wrap{padding:16px 14px 60px}
+  .wrap{padding:16px 14px 18px}
 }
 @media(max-width:400px){
   .kpis{grid-template-columns:1fr}
@@ -771,9 +780,20 @@ show('overview');
 (function(){
   if (window.parent === window) return;          // not embedded — do nothing
   var last = 0;
+  function contentHeight(){
+    /* Measure the CONTENT, not the viewport. body.scrollHeight is at least the viewport
+       height, so once the parent grows the iframe the body fills it and reports the larger
+       number back — a ratchet that only ever grows, leaving dead space below the charts. */
+    var b = 0;
+    for (var i = 0; i < document.body.children.length; i++){
+      var r = document.body.children[i].getBoundingClientRect();
+      if (r.bottom > b) b = r.bottom;
+    }
+    return Math.ceil(b + window.scrollY);
+  }
   function post(){
-    var h = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
-    if (Math.abs(h - last) > 24){ last = h; parent.postMessage({lvcHeight: h}, '*'); }
+    var h = contentHeight();
+    if (Math.abs(h - last) > 8){ last = h; parent.postMessage({lvcHeight: h}, '*'); }
   }
   window.addEventListener('load', post);
   window.addEventListener('resize', post);
