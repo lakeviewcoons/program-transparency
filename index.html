@@ -312,14 +312,19 @@ function monthlyChart(rows){
 
 /* horizontal bars for categories */
 function hbars(rows,total){
-  const W=760,rowH=34,mT=6,mL=6,mR=14,labelW=190,H=rows.length*rowH+mT+6;
+  /* Phone: the category name and the amount collide, because the name is drawn oversized to
+     survive the viewBox downscale and the small bars at the end of the list leave no gap.
+     Below 700px stack the name above its bar. (Tina, live 2026-08-10) */
+  const narrow = window.innerWidth <= 700;
+  const W=760, rowH = narrow?62:34, mT=6, mL=6, mR=14, labelW = narrow?0:190,
+        H=rows.length*rowH+mT+6;
   const s=svg(W,H);
   const maxV=Math.max(...rows.map(r=>r.amount));
   const bx=mL+labelW,bw=W-bx-mR-70;
   const gcol={Operating:'--g-op',Capital:'--g-cap',Financing:'--g-fin',Taxes:'--g-tax'};
   rows.forEach((r,i)=>{
     const yy=mT+i*rowH;
-    s.append(Object.assign(sn('text',{class:'barname',x:mL,y:yy+rowH/2+4}),{textContent:r.category}));
+    s.append(Object.assign(sn('text',{class:'barname',x:mL,y:narrow?yy+20:yy+rowH/2+4}),{textContent:r.category}));
     const w=Math.max(2,(r.amount/maxV)*bw);const col=cssv(gcol[r.group]||'--g-op');
     const b=sn('rect',{class:'bar',x:bx,y:narrow?yy+30:yy+6,width:w,height:narrow?20:rowH-14,rx:4,fill:col});
     b.addEventListener('mousemove',e=>tip(`<b>${r.category}</b><div class=r><span class=k>${r.group}</span><span class=v>${fmt(r.amount)}</span></div><div class=r><span class=k>Share</span><span class=v>${(r.amount/total*100).toFixed(1)}%</span></div>`,e));
@@ -393,9 +398,9 @@ function renderOverview(){
   const k=D.kpis,v=$('#v-overview');v.innerHTML='';
   const wrap=el('div',{class:'kpis'});
   wrap.append(
+    kpi(dtext('Net Position (Total '+(k.net<0?'Loss':'Profit')+')','Where we stand (Total '+(k.net<0?'Loss':'Profit')+')'),fmt(k.net),k.net<0?'exp':'pos', k.net<0?'invested into the cattery':'cumulative profit'),
     kpi('Total Income',fmt(k.income),'pos', k.n_kittens+' kitten sales + placements'),
     kpi(dtext('Total Cash Out','Total spent'),fmt(k.expense),'', 'everything the cattery spent'),
-    kpi(dtext('Net Position (Total '+(k.net<0?'Loss':'Profit')+')','Where we stand (Total '+(k.net<0?'Loss':'Profit')+')'),fmt(k.net),k.net<0?'exp':'pos', k.net<0?'invested into the cattery':'cumulative profit'),
     kpi(dtext('Operating Spend','Running costs'),fmt(k.operating),'', 'day-to-day costs of running the cattery')
   );
   v.append(wrap);
@@ -422,7 +427,7 @@ function renderCosts(){
   // filter chips
   const fc=el('div',{class:'filters'});
   fc.append(el('span',{class:'muted',style:'font-size:12.5px'},'Year:'));
-  ['all',...D.meta.years].forEach(y=>{const c=el('button',{class:'chip'+(costYear===y?' active':'')},y==='all'?'All years':y);
+  ['all',...[...D.meta.years].sort().reverse()].forEach(y=>{const c=el('button',{class:'chip'+(costYear===y?' active':'')},y==='all'?'All years':y);
     c.onclick=()=>{costYear=y;renderCosts();};fc.append(c);});
   v.append(fc);
   // category rows filtered
@@ -721,7 +726,7 @@ function renderFood(){
   const pcWrap=el('div',{class:'tbl-wrap'});const pctab=el('table');
   pctab.append(el('thead',{},el('tr',{},el('th',{},'Year'),el('th',{class:'num'},'Food $'),el('th',{class:'num'},'Avg cats on-site'),el('th',{class:'num'},'$ / cat-day'),el('th',{class:'num'},'$ / cat-month'))));
   const pctb=el('tbody');
-  P.by_year.forEach(r=>pctb.append(el('tr',{},
+  [...P.by_year].sort((a,b)=>b.year.localeCompare(a.year)).forEach(r=>pctb.append(el('tr',{},
     el('td',{},r.year),
     el('td',{class:'num'},fmt(r.food)),
     el('td',{class:'num'},r.avg_cats.toFixed(1)),
