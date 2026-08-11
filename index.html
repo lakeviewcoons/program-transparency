@@ -502,7 +502,7 @@ function stockBars(rows){
     s.append(Object.assign(sn('text',{class:'barname',x:mL,y:yy+rowH/2+4}),{textContent:r.short}));
     const w=Math.max(2,(r.value/maxV)*bw);const col=cssv(r.type==='retained'?'--net':'--g-op');
     const b=sn('rect',{class:'bar',x:bx,y:yy+5,width:w,height:rowH-12,rx:4,fill:col,opacity:r.value?1:.3});
-    b.addEventListener('mousemove',e=>tip(`<b>${r.name}</b><div class=r><span class=k>${r.type==='retained'?dtext('Retained (imputed)','Kept from our litters'):dtext('Purchased (cash)','Bought in')}</span><span class=v>${r.value?fmt(r.value):'—'}</span></div>${r.sub?`<div class=r><span class=k>${r.sub}</span><span class=v></span></div>`:''}`,e));
+    b.addEventListener('mousemove',e=>tip(`<b>${r.name}</b><div class=r><span class=k>${r.type==='retained'?dtext('Kept from our litters','Kept from our litters'):dtext('Bought in','Bought in')}</span><span class=v>${r.value?fmt(r.value):'—'}</span></div>${r.sub?`<div class=r><span class=k>${r.sub}</span><span class=v></span></div>`:''}`,e));
     b.addEventListener('mouseleave',hide);s.append(b);
     s.append(Object.assign(sn('text',{class:'barlabel',x:bx+w+8,y:yy+rowH/2+4}),{textContent:r.value?fmt(r.value):'no basis'}));
   });
@@ -514,14 +514,14 @@ function renderBreeding(){
   const wrap=el('div',{class:'kpis'});
   wrap.append(
     kpi(dtext('Total Breeding-Stock Investment','Invested in our breeding cats'),fmt(B.total_net),'', 'foundation + retained · '+nCats+' cats'),
-    kpi(dtext('Retained Home-Bred (imputed)','Cats we kept from our litters'),fmt(B.retained_total),'', 'what we gave up by keeping them'),
+    kpi(dtext('Cats We Kept From Our Litters','Cats we kept from our litters'),fmt(B.retained_total),'', 'what we gave up by keeping them'),
     kpi(dtext('Booked in Cash Ledger (gross)','Total paid for breeding cats'),fmt(B.ledger_gross))
   );
   v.append(wrap);
   const note=el('div',{class:'card'},el('h2',{},'How to read this'),
     el('div',{class:'desc',html: isBuyer()
       ? 'What our breeding cats represent. <b>Cats we bought in</b> are real money paid to buy or import a breeder — '+fmt(B.found_gross)+' in total, or '+fmt(B.found_net)+' once we count money recovered when a cat was later placed in a pet home. <b>Cats we kept</b> from our own litters cost us nothing out of pocket, so their '+fmt(B.retained_total)+' is what we gave up by not selling them — the price their littermates fetched. That figure is kept out of the cash totals.'
-      : 'Your total capital in breeding stock. <b>Foundation</b> cats are the real dollars paid to acquire imported/purchased breeders — now <b>fully booked in the cash ledger</b> (gross '+fmt(B.found_gross)+'; '+fmt(B.found_net)+' net after '+fmt(B.found_recoup)+' recouped from retired-breeder placements). We reconciled this in 2026: the ledger previously captured only '+fmt(30406.15)+' because the earliest 2019 cash/Western-Union imports left no bank record. <b>Retained</b> cats are kittens you kept from your own litters — no money changed hands, so this '+fmt(B.retained_total)+' is an <b>imputed</b> opportunity cost (what their littermates sold for) and is deliberately kept OUT of the cash Net Position (−'+fmt(Math.abs(D.kpis.net))+'), which stays a true cash figure for loan and reserve planning.'}));
+      : 'What we have put into our breeding cats. <b>Foundation</b> cats are real money paid to buy or import a breeder — '+fmt(B.found_gross)+' in total, or '+fmt(B.found_net)+' after '+fmt(B.found_recoup)+' came back when a cat was later placed in a pet home. The ledger used to show only '+fmt(30406.15)+' of this, because the earliest 2019 cash and Western-Union imports left no bank record; the rest was added back in 2026. <b>Retained</b> cats are kittens we kept from our own litters. No money changed hands, so their '+fmt(B.retained_total)+' is what we gave up by not selling them — the price their littermates fetched — and it stays out of the Net Position (−'+fmt(Math.abs(D.kpis.net))+'), which we keep as a true cash figure for loan and reserve planning.'}));
   v.append(note);
   const rows=[
     ...B.foundation.map(f=>({name:f.name,short:f.name.split(' ').slice(-1)[0].length>2?(f.name.replace(/^(RW |QGC |RW QGC |CH |GRC |IAU )/,'').split(' ')[0]):f.name,value:f.net,type:'foundation',sub:f.origin})),
@@ -531,8 +531,8 @@ function renderBreeding(){
   rows.forEach(r=>{if(r.type==='foundation'){r.short=r.name.replace('LakeViewCoons ','').replace(/^(RW QGC |RW |QGC |CH |GRC |IAU )/,'');}});
   rows.sort((a,b)=>b.value-a.value);
   const c1=el('div',{class:'card'},el('h2',{},dtext('Every Breeding Cat by Investment Value','What each breeding cat represents')),
-    el('div',{class:'desc'},dtext('Purchased foundation cats (cash) and retained home-bred breeders (imputed), largest first.','Cats we bought in, and cats we kept back from our own litters — largest investment first.')));
-  c1.append(legend([['--g-op',dtext('Purchased (cash)','Bought in')],['--net',dtext('Retained (imputed)','Kept from our litters')]]));
+    el('div',{class:'desc'},dtext('Cats we bought in, and cats we kept back from our own litters — largest first.','Cats we bought in, and cats we kept back from our own litters — largest investment first.')));
+  c1.append(legend([['--g-op',dtext('Bought in','Bought in')],['--net',dtext('Kept from our litters','Kept from our litters')]]));
   c1.append(stockBars(rows));v.append(c1);
   // foundation table
   const c2=el('div',{class:'card'},el('h2',{},dtext('Foundation Cats — Acquisition Cost','Cats we bought in — what they cost')),el('div',{class:'desc'},dtext('Purchased & imported breeding stock, native cost converted to USD at historical FX. Net = after retired-placement recoups.','Breeding cats we bought, including imports from overseas. Amounts shown in US dollars, after any money recovered when a cat was later placed in a pet home.')));
@@ -543,12 +543,12 @@ function renderBreeding(){
   tb1.append(el('tr',{style:'font-weight:700'},el('td',{},'Total'),el('td',{}),el('td',{}),el('td',{}),el('td',{class:'num'},fmt(B.found_gross)),el('td',{class:'num'},fmt(B.found_recoup)),el('td',{class:'num'},fmt(B.found_net))));
   t1.append(tb1);c2.append(el('div',{class:'tbl-wrap'},t1));v.append(c2);
   // retained table
-  const c3=el('div',{class:'card'},el('h2',{},dtext('Retained Home-Bred Breeders — Imputed Value','Cats we kept from our own litters')),el('div',{class:'desc'},dtext('Kittens kept from your own litters. Value = the pet price their littermates sold for (foregone sale).','Kittens we kept back instead of selling. Valued at what their littermates sold for.')));
+  const c3=el('div',{class:'card'},el('h2',{},dtext('Cats We Kept From Our Own Litters','Cats we kept from our own litters')),el('div',{class:'desc'},dtext('Kittens we kept from our own litters, valued at what their littermates sold for.','Kittens we kept back instead of selling. Valued at what their littermates sold for.')));
   const t2=el('table');t2.append(el('thead',{},el('tr',{},...['Cat','Sex','Retained from Litter','Date','Status','Imputed Value'].map((h,i)=>el('th',{class:i===5?'num':''},h)))));
   const tb2=el('tbody');B.retained.forEach(r=>tb2.append(el('tr',{},
     el('td',{},r.name.replace('LakeViewCoons ','')),el('td',{class:'mono'},r.sex||''),el('td',{},r.litter||''),el('td',{class:'mono muted'},r.date||''),el('td',{class:'muted'},r.status||''),
     el('td',{class:'num'},r.value?fmt(r.value):'no basis'))));
-  tb2.append(el('tr',{style:'font-weight:700'},el('td',{},dtext('Total imputed','Total value kept back')),el('td',{}),el('td',{}),el('td',{}),el('td',{}),el('td',{class:'num'},fmt(B.retained_total))));
+  tb2.append(el('tr',{style:'font-weight:700'},el('td',{},dtext('Total value kept back','Total value kept back')),el('td',{}),el('td',{}),el('td',{}),el('td',{}),el('td',{class:'num'},fmt(B.retained_total))));
   t2.append(tb2);c3.append(el('div',{class:'tbl-wrap'},t2));
   v.append(c3);
 }
@@ -754,11 +754,11 @@ function renderFood(){
         ' over '+P.total_catdays.toLocaleString()+' cat-days between '+F.years[0]+' and '+F.years[F.years.length-1]+
         '. A kitten is not cheaper than an adult: for the '+P.place_age_days+' days it is with us it eats about <b>twice as often</b>, so a kitten-day counts as two adult-days here. Kittens are fed from birth until they go home.'
       : 'Every food dollar ('+fmt(P.total_food)+') spread across '+P.total_catdays.toLocaleString()+
-        ' cat-days, '+F.years[0]+'–'+F.years[F.years.length-1]+', <b>weighted</b>: a kitten eats ~'+P.kitten_weight+
-        '\u00d7 as often as an adult, so its days count double. '+P.kitten_days.toLocaleString()+' kitten-days + '+
-        P.adult_days.toLocaleString()+' adult-days = '+P.weighted_days.toLocaleString()+
-        ' adult-equivalent days, and the rate is solved per adult-day. Kitten = the first '+P.place_age_days+
-        ' days of life (birth\u2192placement). Reconciles exactly to the food ledger.'}));
+        ' cat-days, '+F.years[0]+'–'+F.years[F.years.length-1]+'. A kitten eats about '+P.kitten_weight+
+        '\u00d7 as often as an adult, so its days count double: '+P.kitten_days.toLocaleString()+' kitten-days plus '+
+        P.adult_days.toLocaleString()+' adult-days works out to '+P.weighted_days.toLocaleString()+
+        ' adult-days in all, and the rate comes out per adult-day. A kitten is the first '+P.place_age_days+
+        ' days of life, birth to going home. The totals add back exactly to what we spent on food.'}));
   const pk=el('div',{class:'kpis'});
   pk.append(
     kpi(dtext('Adult Cat / Day','One adult cat, a day'),dollars2(P.per_day),'', F.years[0]+'–'+F.years[F.years.length-1]),
@@ -782,8 +782,8 @@ function renderFood(){
       ' a month ('+fmt(P.herd_annual)+' a year) to feed, before any litter on the ground. A litter of nine adds roughly '+
       fmt(P.per_kitten_food*9)+' of food across the '+P.place_age_days+' days before they go home.'
     : 'Current resident herd (breeders + retirees on-site): '+P.resident_herd+' adults \u2192 ~'+fmt(P.herd_monthly)+
-      '/mo ('+fmt(P.herd_annual)+'/yr) at the adult rate, kittens on top. 2026 reads low because it is a partial, unevenly-billed year. Method: kitten-days weighted '+P.kitten_weight+
-      '\u00d7 adult-days; presence estimated from births and placements since per-cat dates aren\u2019t recorded.'));
+      '/mo ('+fmt(P.herd_annual)+'/yr) at the adult rate, kittens on top. 2026 looks low because the year is only part done and food is not billed evenly. Kitten days count '+P.kitten_weight+
+      '\u00d7 adult days. We work out how long each cat was here from births and placements, since we do not record per-cat dates.'));
   v.append(cPC);
   // vendor journey (lead)
   const c1=el('div',{class:'card'},el('h2',{},'The Vendor Journey'),
