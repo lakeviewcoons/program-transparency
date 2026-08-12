@@ -17,8 +17,8 @@
   --surface-0:#f6f8fa; --surface-1:#ffffff; --surface-2:#f2f5f8;
   --border:#dde5ec; --border-strong:#c7d3dd;
   --text-primary:#0f1b22; --text-secondary:#4a5b68; --text-muted:#78889a;
-  --income:#1a8078; --expense:#2f6f9f; --net:#8a6d1f; --expense-bar:#94433a;
-  --g-op:#2f6f9f; --g-cap:#8a6d1f; --g-fin:#8a5a8a; --g-tax:#a8524a;
+  --income:#1a8078; --expense:#2f6f9f; --net:#cf9b12; --expense-bar:#94433a;
+  --g-op:#2f6f9f; --g-cap:#cf9b12; --g-fin:#8a5a8a; --g-tax:#a8524a;
   --pos:#1a8078; --neg:#b4544c;
   --c1:#1f6f66; --c2:#9a6b12; --c3:#35608f; --c4:#8a4f86; --c5:#4a7f2f; --c6:#b04a30;
   --c7:#6a5aa8; --c8:#8a7a1f; --c9:#2b8078; --c10:#a34a70; --c11:#5a6672; --c12:#8a5730;
@@ -29,8 +29,8 @@
   --surface-0:#000000; --surface-1:#0a0f14; --surface-2:#101922;
   --border:#1b242d; --border-strong:#2a3742;
   --text-primary:#f2f6f8; --text-secondary:#93a3b0; --text-muted:#6f7f8b;
-  --income:#3aab9e; --expense:#6f9ecf; --net:#c9a227; --expense-bar:#b8564e;
-  --g-op:#3aab9e; --g-cap:#c9a227; --g-fin:#b07fb0; --g-tax:#d4736b;
+  --income:#3aab9e; --expense:#6f9ecf; --net:#e8c34a; --expense-bar:#b8564e;
+  --g-op:#3aab9e; --g-cap:#e8c34a; --g-fin:#b07fb0; --g-tax:#d4736b;
   --pos:#3aab9e; --neg:#d4736b;
   --c1:#3aab9e; --c2:#e0a33a; --c3:#7fa8d9; --c4:#c98bc4; --c5:#8fc46b; --c6:#e07a5f;
   --c7:#b6a4e8; --c8:#d9c96b; --c9:#5ec8bf; --c10:#e08cae; --c11:#9aa7b4; --c12:#c4855c;
@@ -60,6 +60,11 @@ main{max-width:1200px;margin:0 auto;padding:22px}
 .view.active{display:block}
 @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:22px}
+/* P&L Overview: the net-position chip is the headline, so it spans the full width and the two
+   figures it is made of — income and spend — sit side by side underneath it. */
+.kpis.lead{grid-template-columns:1fr 1fr}
+.kpis.lead > .kpi:first-child{grid-column:1/-1}
+.kpis.lead > .kpi:first-child .val{font-size:34px}
 .kpi{background:var(--surface-1);border:1px solid var(--border);border-radius:14px;padding:16px 18px;box-shadow:var(--shadow)}
 .kpi .label{font-size:12.5px;color:var(--text-secondary);font-weight:700;letter-spacing:.04em}
 .kpi .val{font-size:26px;font-weight:400;margin-top:6px;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
@@ -71,7 +76,9 @@ main{max-width:1200px;margin:0 auto;padding:22px}
 .card .desc{color:var(--text-muted);font-size:12.5px;margin-bottom:14px}
 .row{display:grid;gap:20px}
 @media(min-width:860px){.row.two{grid-template-columns:1fr 1fr}}
-.legend{display:flex;gap:16px;flex-wrap:wrap;margin:2px 0 12px;font-size:12.5px;color:var(--text-secondary)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;margin:2px 0 4px;font-size:12.5px;color:var(--text-secondary)}
+/* a chart is the last thing in most cards — claw back some of the card's bottom padding */
+.card > svg:last-child{margin-bottom:-8px}
 .legend span{display:inline-flex;align-items:center;gap:6px}
 .dot{width:11px;height:11px;border-radius:3px;display:inline-block}
 .filters{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:16px}
@@ -173,8 +180,8 @@ tbody tr:hover{background:var(--surface-2)}
     --surface-0:#fff; --surface-1:#fff; --surface-2:#fff;
     --border:#ccc; --border-strong:#aaa;
     --text-primary:#111; --text-secondary:#444; --text-muted:#666;
-    --income:#1a8078; --expense:#2f6f9f; --net:#8a6d1f; --expense-bar:#94433a;
-    --g-op:#2f6f9f; --g-cap:#8a6d1f; --g-fin:#8a5a8a; --g-tax:#a8524a;
+    --income:#1a8078; --expense:#2f6f9f; --net:#cf9b12; --expense-bar:#94433a;
+    --g-op:#2f6f9f; --g-cap:#cf9b12; --g-fin:#8a5a8a; --g-tax:#a8524a;
     --pos:#1a8078; --neg:#b4544c; --shadow:none; color-scheme:light;
     --c1:#1f6f66; --c2:#9a6b12; --c3:#35608f; --c4:#8a4f86; --c5:#4a7f2f; --c6:#b04a30;
     --c7:#6a5aa8; --c8:#8a7a1f; --c9:#2b8078; --c10:#a34a70; --c11:#5a6672; --c12:#8a5730;
@@ -277,9 +284,9 @@ function pnlChart(rows,netVar){netVar=netVar||'--net';
     s.append(Object.assign(sn('text',{class:'axtx',x:x0+gw-1,y:H-mB+16,'text-anchor':'middle'}),{textContent:r.year}));
   });
   let dpath='';rows.forEach((r,i)=>{const cx=mL+i*bw+bw/2;const cy=y(r.net);dpath+=(i?'L':'M')+cx+' '+cy+' ';});
-  s.append(sn('path',{d:dpath,fill:'none',stroke:cssv(netVar),'stroke-width':2,'stroke-linecap':'round','stroke-linejoin':'round','opacity':.95}));
+  s.append(sn('path',{d:dpath,fill:'none',stroke:cssv(netVar),'stroke-width':2.8,'stroke-linecap':'round','stroke-linejoin':'round','opacity':1}));
   rows.forEach((r,i)=>{const cx=mL+i*bw+bw/2,cy=y(r.net);
-    const c=sn('circle',{cx,cy,r:4.5,fill:cssv('--surface-1'),stroke:cssv(netVar),'stroke-width':2});
+    const c=sn('circle',{cx,cy,r:5,fill:cssv('--surface-1'),stroke:cssv(netVar),'stroke-width':2.4});
     c.addEventListener('mousemove',e=>tip(`<b>${r.year} net</b><div class=r><span class=k>Net</span><span class=v style="color:${r.net<0?cssv('--neg'):cssv('--pos')}">${fmt(r.net)}</span></div>`,e));
     c.addEventListener('mouseleave',hide);s.append(c);});
   return s;
@@ -321,18 +328,23 @@ function hbars(rows,total,colorFn){
      survive the viewBox downscale and the small bars at the end of the list leave no gap.
      Below 700px stack the name above its bar. (Tina, live 2026-08-10) */
   const narrow = window.innerWidth <= 700;
-  const W=760, rowH = narrow?62:34, mT=6, mL=6, mR=14, labelW = narrow?0:190,
-        H=rows.length*rowH+mT+6;
+  const W=760, rowH = narrow?62:34, mT=0, mL=6, mR=14, labelW = narrow?0:190,
+        H=rows.length*rowH;
   const s=svg(W,H);
   const maxV=Math.max(...rows.map(r=>r.amount));
   const bx=mL+labelW,bw=W-bx-mR-70;
   const gcol={Operating:'--g-op',Capital:'--g-cap',Financing:'--g-fin',Taxes:'--g-tax'};
   rows.forEach((r,i)=>{
     const yy=mT+i*rowH;
-    s.append(Object.assign(sn('text',{class:'barname',x:mL,y:narrow?yy+20:yy+rowH/2+4}),{textContent:r.category}));
+    const ind = r.child ? (narrow?14:16) : 0;
+    s.append(Object.assign(sn('text',{class:'barname',x:mL+ind,y:narrow?yy+20:yy+rowH/2+4}),
+      {textContent:(r.child?'\u2514 ':'')+r.category}));
     const w=Math.max(2,(r.amount/maxV)*bw);const col=cssv(colorFn?colorFn(r):(gcol[r.group]||'--g-op'));
-    const b=sn('rect',{class:'bar',x:bx,y:narrow?yy+30:yy+6,width:w,height:narrow?20:rowH-14,rx:4,fill:col});
-    b.addEventListener('mousemove',e=>tip(`<b>${r.category}</b><div class=r><span class=k>${r.group}</span><span class=v>${fmt(r.amount)}</span></div><div class=r><span class=k>Share</span><span class=v>${(r.amount/total*100).toFixed(1)}%</span></div>`,e));
+    const bh = narrow?20:rowH-8, ch = r.child ? bh-6 : bh;
+    const b=sn('rect',{class:'bar',x:bx,y:(narrow?yy+30:yy+(rowH-bh)/2)+(bh-ch)/2,width:w,height:ch,rx:4,fill:col,
+      opacity: r.child?0.72:1});
+    b.addEventListener('mousemove',e=>tip(`<b>${r.category}</b><div class=r><span class=k>${glab(r.group)}</span><span class=v>${fmt(r.amount)}</span></div>`+
+      (r.child?'':`<div class=r><span class=k>Share</span><span class=v>${(r.amount/total*100).toFixed(1)}%</span></div>`),e));
     b.addEventListener('mouseleave',hide);s.append(b);
     s.append(Object.assign(sn('text',{class:'barlabel',x:bx+w+8,y:narrow?yy+46:yy+rowH/2+4}),{textContent:fmt(r.amount)}));
   });
@@ -341,7 +353,7 @@ function hbars(rows,total,colorFn){
 
 /* stacked bars by year for groups */
 function stackByYear(){
-  const groups=['Operating','Capital','Financing'];
+  const groups=['Operating','Capital','Financing'];   // data values, not display names
   const gcol={Operating:'--g-op',Capital:'--g-cap',Financing:'--g-fin',Taxes:'--g-tax'};
   const byYear={};D.exp_cat_year.forEach(r=>{});
   // build from tx groups
@@ -359,7 +371,7 @@ function stackByYear(){
   yrs.forEach((yr,i)=>{let acc=0;const x0=mL+i*bw+(bw-w)/2;
     groups.forEach(g=>{const v=map[yr][g];if(v<=0)return;const bh=(v/maxV)*ih;const yTop=y(acc+v);
       const b=sn('rect',{class:'bar',x:x0,y:yTop,width:w,height:Math.max(0,bh-1.5),rx:2,fill:cssv(gcol[g])});
-      b.addEventListener('mousemove',e=>tip(`<b>${yr} · ${g}</b><div class=r><span class=k>Amount</span><span class=v>${fmt(v)}</span></div><div class=r><span class=k>Year total</span><span class=v>${fmt(totals[i])}</span></div>`,e));
+      b.addEventListener('mousemove',e=>tip(`<b>${yr} · ${glab(g)}</b><div class=r><span class=k>Amount</span><span class=v>${fmt(v)}</span></div><div class=r><span class=k>Year total</span><span class=v>${fmt(totals[i])}</span></div>`,e));
       b.addEventListener('mouseleave',hide);s.append(b);acc+=v;});
     s.append(Object.assign(sn('text',{class:'axtx',x:x0+w/2,y:H-mB+16,'text-anchor':'middle'}),{textContent:yr}));
   });
@@ -401,12 +413,11 @@ const dtext=(priv,buyer)=>isBuyer()?buyer:priv;
 /* ================= VIEWS ================= */
 function renderOverview(){
   const k=D.kpis,v=$('#v-overview');v.innerHTML='';
-  const wrap=el('div',{class:'kpis'});
+  const wrap=el('div',{class:'kpis lead'});
   wrap.append(
     kpi(dtext('Net Position (Total '+(k.net<0?'Loss':'Profit')+')','Where we stand (Total '+(k.net<0?'Loss':'Profit')+')'),fmt(k.net),k.net<0?'exp':'pos', k.net<0?'invested into the cattery':'cumulative profit'),
     kpi('Total Income',fmt(k.income),'pos', k.n_kittens+' kitten sales + placements'),
-    kpi(dtext('Total Cash Out','Total spent'),fmt(k.expense),'', 'everything the cattery spent'),
-    kpi(dtext('Operating Spend','Operating costs'),fmt(k.operating),'', 'day-to-day costs of running the cattery')
+    kpi(dtext('Total Cash Out','Total spent'),fmt(k.expense),'', 'everything the cattery spent')
   );
   v.append(wrap);
   const c1=el('div',{class:'card'},el('h2',{},'Income vs. Expenses by Year'),el('div',{class:'desc'},'Bars compare money in and money out each year; the line traces net (profit/loss). Hover for detail.'));
@@ -430,9 +441,12 @@ function renderCosts(){
   const v=$('#v-costs');v.innerHTML='';
   const k=D.kpis;
   const wrap=el('div',{class:'kpis'});
+  const B=D.breeding;
   wrap.append(
-    kpi('Operating',fmt(k.operating),'', fmt(k.operating/D.pnl_yearly.length)+' / yr avg'),
-    kpi(dtext('Capital','Breeding cats'),fmt(k.capital),'','buying our breeding cats')
+    kpi('Operating Costs',fmt(k.operating),'', fmt(k.operating/D.pnl_yearly.length)+' / yr avg'),
+    kpi('Total Breeding Stock',fmt(B.total_gross),'', 'bought in + kept back'),
+    kpi('New Cat Acquisition',fmt(k.capital),'','cats we bought in'),
+    kpi('Cats We Kept',fmt(B.retained_total),'','kept back from our own litters')
   );
   v.append(wrap);
   // filter chips
@@ -443,18 +457,33 @@ function renderCosts(){
   v.append(fc);
   // category rows filtered
   let rows;let total;
-  if(costYear==='all'){rows=D.exp_by_cat.slice();total=k.expense;}
+  if(costYear==='all'){
+    rows=D.exp_by_cat.slice();total=k.expense;
+    const B0=D.breeding, i=rows.findIndex(r=>r.category==='New Cat Acquisition');
+    if(i>=0){
+      rows[i]={category:'Total breeding stock',amount:B0.total_gross,group:'Capital'};
+      rows.sort((a,b)=>b.amount-a.amount);
+      const j=rows.findIndex(r=>r.category==='Total breeding stock');
+      rows.splice(j+1,0,
+        {category:'New cat acquisition',amount:B0.found_gross,group:'Capital',child:true},
+        {category:'Cats we kept back',amount:B0.retained_total,group:'Capital',child:true});
+    }
+  }
   else{const m={};D.exp_cat_year.filter(r=>r.year===costYear).forEach(r=>m[r.category]=r.amount);
     const grp={};D.exp_by_cat.forEach(r=>grp[r.category]=r.group);
     rows=Object.keys(m).map(cat=>({category:cat,amount:m[cat],group:grp[cat]})).sort((a,b)=>b.amount-a.amount);
     total=rows.reduce((a,r)=>a+r.amount,0);}
   const c1=el('div',{class:'card'},el('h2',{},'Where the Money Goes'+(costYear==='all'?'':' — '+costYear)),
     el('div',{class:'desc'},dtext('Every expense category, largest first — total ','Everything we spend on, largest first — total ')+fmt(total)+'. Color = spend type.'));
-  c1.append(legend([['--g-op','Operating'],['--g-cap','Capital'],['--g-fin','Financing']]));
+  if(costYear==='all') c1.append(el('div',{class:'note',style:'margin:-8px 0 4px'},
+    'Total breeding stock is shown whole, with its two parts indented beneath it. Only the '+
+    fmt(D.breeding.found_gross)+' we paid out for cats is in the '+fmt(total)+' total — the '+
+    fmt(D.breeding.retained_total)+' for cats we kept back never cost cash.'));
+  c1.append(legend([['--g-op',glab('Operating')],['--g-cap',glab('Capital')],['--g-fin',glab('Financing')]]));
   c1.append(hbars(rows,total));
   v.append(c1);
-  const c2=el('div',{class:'card'},el('h2',{},dtext('Spend Type by Year','Where the money went, by year')),el('div',{class:'desc'},dtext('Stacked totals show how operating, capital and financing costs shifted year to year.','How our spending changed from one year to the next.')));
-  c2.append(legend([['--g-op','Operating'],['--g-cap','Capital'],['--g-fin','Financing']]));
+  const c2=el('div',{class:'card'},el('h2',{},dtext('Spend Type by Year','Where the money went, by year')),el('div',{class:'desc'},dtext('How operating costs, new cat acquisition and interest & financing shifted year to year.','How our spending changed from one year to the next.')));
+  c2.append(legend([['--g-op',glab('Operating')],['--g-cap',glab('Capital')],['--g-fin',glab('Financing')]]));
   c2.append(stackByYear());
   v.append(c2);
 }
@@ -511,11 +540,12 @@ function stockBars(rows){
 function renderBreeding(){
   const v=$('#v-breeding');v.innerHTML='';const B=D.breeding;
   const nCats=B.foundation.length+B.retained.filter(r=>r.value>0).length;
-  const wrap=el('div',{class:'kpis'});
+  // Headline spans the row; the two figures it is made of sit underneath it.
+  const wrap=el('div',{class:'kpis lead'});
   wrap.append(
-    kpi(dtext('Total Breeding-Stock Investment','Invested in our breeding cats'),fmt(B.total_net),'', 'foundation + retained · '+nCats+' cats'),
-    kpi(dtext('Cats We Kept From Our Litters','Cats we kept from our litters'),fmt(B.retained_total),'', 'what we gave up by keeping them'),
-    kpi(dtext('Booked in Cash Ledger (gross)','Total paid for breeding cats'),fmt(B.ledger_gross))
+    kpi(dtext('Total Breeding-Stock Investment','Invested in our breeding cats'),fmt(B.total_net),'', 'bought in + kept back · '+nCats+' cats'),
+    kpi(dtext('Booked in Cash Ledger (gross)','Total paid for breeding cats'),fmt(B.ledger_gross),'', 'real money paid out'),
+    kpi(dtext('Cats We Kept From Our Litters','Cats we kept from our litters'),fmt(B.retained_total),'', 'what we gave up by keeping them')
   );
   v.append(wrap);
   const note=el('div',{class:'card'},el('h2',{},'How to read this'),
@@ -556,6 +586,12 @@ function renderBreeding(){
 
 
 /* ================= VET & HEALTH ================= */
+/* Display names for the spend-type groups. The underlying values in D.tx.group are still
+   'Operating' / 'Capital' / 'Financing' — they key the colour maps and the Explore filter — so
+   rename here, never in the data. */
+const GLABEL={Operating:'Operating Costs',Capital:'New Cat Acquisition',
+              Financing:'Interest & Financing',Taxes:'Taxes',Income:'Income'};
+const glab=g=>GLABEL[g]||g;
 const VETSEC={A:'--g-cap',D:'--income',E:'--neg','overhead':'--text-muted',C:'--g-fin'};
 const VETCOH={breeder:'--g-op',retiree:'--net',kitten:'--income',other:'--text-muted',unmapped:'--text-muted'};
 
